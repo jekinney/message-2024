@@ -19,6 +19,7 @@ class MessageFactory extends Factory
     {
         // Author id is set by auth user
         return [
+            'author_id' => User::Factory()->create()->id,
             'body' => fake()->sentence,
         ];
     }
