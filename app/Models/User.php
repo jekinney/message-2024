@@ -96,20 +96,21 @@ class User extends Authenticatable
     }
 
     /**
-     * A User can remove a person they are following
+     * A User can add a person they want to follow
      *
      * @param  int $id
      * @return boolean
      */
-    public function removeFollowing(int $id): bool
+    public function addFollower(int $id): bool
     {
-        if ( $user = $this->find($id) ) {
-            return auth()->user()->following()->detach($user);
+        if( $user = $this->find($id) ) {
+            $user->following()->attach(auth()->user()->id);
+            return true;
         }
         abort(401, 'User not found.');
     }
 
-    /**
+     /**
      * A User can add a person they want to follow
      *
      * @param  int $id
@@ -120,6 +121,34 @@ class User extends Authenticatable
         if( $user = $this->find($id) ) {
             auth()->user()->following()->attach($user);
             return true;
+        }
+        abort(401, 'User not found.');
+    }
+
+    /**
+     * A User can remove a person they are following
+     *
+     * @param  int $id
+     * @return boolean
+     */
+    public function removeFollower(int $id): bool
+    {
+        if ( $user = $this->find($id) ) {
+            return $user->following()->detach(auth()->user());
+        }
+        abort(401, 'User not found.');
+    }
+
+    /**
+     * A User can remove a person they are following
+     *
+     * @param  int $id
+     * @return boolean
+     */
+    public function removeFollowing(int $id): bool
+    {
+        if ( $user = $this->find($id) ) {
+            return auth()->user()->following()->detach($user);
         }
         abort(401, 'User not found.');
     }
