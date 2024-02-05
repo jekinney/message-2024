@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import Pagination from '../../Components/Pagination.vue';
 
 const props = defineProps({
     following: Object,
@@ -45,5 +46,6 @@ const form = useForm({
             </div>
         </div>
 
+        <Pagination :collection="following" />
     </AuthenticatedLayout>
 </template>

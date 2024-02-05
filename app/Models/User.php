@@ -3,8 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,6 +52,50 @@ class User extends Authenticatable
     ];
 
     /**
+     * Register the Telescope gate.
+     *
+     * This gate determines who can access Telescope in non-local environments.
+     */
+    protected function gate(): void
+    {
+        Gate::define('viewTelescope', function (User $user) {
+            return in_array($user->email, [
+                'test@example.com',
+            ]);
+        });
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return HasMany
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return HasMany
+     */
+    public function unlikes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return HasMany
+     */
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    /**
      * Relationship to Message Model
      *
      * @return HasMany
@@ -90,8 +137,38 @@ class User extends Authenticatable
             )->withTimestamps();
     }
 
+    /**
+     * Search db by a user name
+     *
+     * @param  Request $request
+     * @return LengthAwarePaginator
+     */
+    public function search(User $query, Request $request): LengthAwarePaginator
+    {
+        // Validate we have a name variable
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        return $query->where('name', 'like', '%'.$request->name.'%')
+                ->paginate($request->amount?? 10);
+    }
+    /**
+     * A public list of users'. Will not
+     * include any private or otherwise
+     * users deemed unacceptable, ban,
+     * deleted, etc.
+     *
+     * @param  Request $request
+     * @return LengthAwarePaginator
+     */
     public function publicList(Request $request): LengthAwarePaginator
     {
+        if ( $request->has('name') ) {
+            return $this->latest()
+                ->where('name', 'LIKE', '%'.$request->name.'%')
+                ->paginate($request->amount?? 10);
+        }
         return $this->latest()->paginate($request->amount?? 10);
     }
 
@@ -153,13 +230,23 @@ class User extends Authenticatable
         abort(401, 'User not found.');
     }
 
-    public function getFollowing()
+    /**
+     * Get a users that our auth user
+     * is following users ids' for
+     * showing which users are
+     * being followed.
+     *
+     * @return Collection|null
+     */
+    public function getFollowing(): Collection|null
     {
+        // load a user's following users
         $following = auth()->user()->following;
-
+        // If empty (not following any users) return null
         if ( $following->isEmpty() ) {
             return null;
         }
+        // return a collection of user ids'
         return $following->pluck('id');
     }
 }

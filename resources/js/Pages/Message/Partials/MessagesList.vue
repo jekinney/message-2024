@@ -1,7 +1,6 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
 
-
 const props = defineProps({
     messages: Object,
 });
@@ -11,21 +10,29 @@ function hasMessages(messages) {
 }
 
 function addLike(id) {
-    router.post('/likes/like', {
-        id: id
-    })
+    router.post(`/api/message/like/${id}`)
+
+    router.reload()
 }
 
 function addUnlike(id) {
-    router.post('/likes/unlike', {
-        id: id
-    })
+    console.log(id)
+    // this.$inertia.post(`/message/unlike/${id}`)
+    // .then(response => {
+    //     this.messages = response.data.data
+    // }).catch(errors => {
+    //     console.log(errors)
+    // })
 }
 
 function submitReport(id) {
-    router.post('/messages/report', {
-        id: id
-    })
+    console.log(id)
+    // this.$inertia.post(`/message/report/${id}`)
+    // .then(response => {
+    //     this.messages = response.data.data
+    // }).catch(errors => {
+    //     console.log(errors)
+    // })
 }
 </script>
 
@@ -49,7 +56,7 @@ function submitReport(id) {
 
             <footer class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <button @click="addUnlike(message)" class="text-blue-500 hover:text-blue-700 focus:outline-none mr-3">
+                    <button @click="addLike(message.id)" class="text-blue-500 hover:text-blue-700 focus:outline-none mr-3">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4"
@@ -65,8 +72,9 @@ function submitReport(id) {
                                 d="M3 10a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7 10a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm-4 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"
                             />
                         </svg>
+                        <span>{{  message.likeable_count }}</span>
                     </button>
-                    <button @click="addLike(message)" class="text-red-500 hover:text-red-700 focus:outline-none mr-3">
+                    <button @click="addUnlike(message.id)" class="text-red-500 hover:text-red-700 focus:outline-none mr-3">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4"
@@ -78,6 +86,7 @@ function submitReport(id) {
                                 d="M10 2a8 8 0 0 0-8 8c0 4.418 3.582 8 8 8s8-3.582 8-8a8 8 0 0 0-8-8zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm1-9h-2v5h2V7z"
                             />
                         </svg>
+                        <span>{{  message.unlikeable_count }}</span>
                     </button>
                 </div>
                 <button @click="submitReport(message)" class="text-gray-500 hover:text-gray-700 focus:outline-none">

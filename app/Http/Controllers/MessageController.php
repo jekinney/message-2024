@@ -38,10 +38,52 @@ class MessageController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove a message
+     *
+     * @param  Message $message
+     * @return void
      */
     public function destroy(Message $message)
     {
         return Inertia::render('Message/List', $message->remove());
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Message $message
+     * @return void
+     */
+    public function like(Request $request, Message $message)
+    {
+        $message->addLike();
+
+        return $message->feed($request)->toJson();
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Message $message
+     * @return void
+     */
+    public function unlike(Message $message)
+    {
+        $message->addUnlike();
+
+        return response()->redirect('messages');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Message $message
+     * @return void
+     */
+    public function report(Message $message)
+    {
+        $message->addReport();
+
+        return response()->redirect('messages');
     }
 }

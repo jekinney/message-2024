@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group( function() {
     Route::get('/users', [UserController::class, 'index'])->name('users');
 
     Route::get('/messages', [MessageController::class, 'index'])->name('messages');
+    Route::post('/message', [MessageController::class, 'store'])->name('message.store');
 
     Route::get('/followers', [FollowerController::class, 'index'])->name('followers');
 

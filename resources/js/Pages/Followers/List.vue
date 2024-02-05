@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Pagination from '../../Components/Pagination.vue';
 import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -23,5 +24,6 @@ const props = defineProps({
                 </div>
             </div>
         </div>
+        <Pagination :collection="followers" />
     </AuthenticatedLayout>
 </template>

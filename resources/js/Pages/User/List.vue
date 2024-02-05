@@ -1,15 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import Pagination from '../../Components/Pagination.vue';
+import UserListCards from './Partials/UserListCard.vue';
 
 const props = defineProps({
     users: Object,
     following: Array
 });
 
-const form = useForm({
-    id: null
-});
+const search = useForm({
+    name: null
+})
 
 </script>
 
@@ -18,51 +20,31 @@ const form = useForm({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Users</h2>
-        </template>
-        <div class="py-12">
-            <div v-if="users.data" v-for="user in users.data"  class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-4">
-                    <header class="p-2">
-                        <a href="" class="">{{  user.name }}</a> signed up {{  user.created_at }}
-                    </header>
-                    <hr>
-                    <footer class="p-2">
-                        <a href="" class="">Profile</a>
-                        <form v-if="following !== null && following.includes(user.id)" @submit.prevent="form.delete('/following/'+ user.id)" >
-                            <input type="hidden" v-model="form.id" />
-                            <button
-                                type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm
-                                font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none
-                                focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                            >
-                                Un-follow
-                            </button>
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Users</h2>
+                <div class="flex items-right justify-center">
+                    <div class="bg-white shadow-md rounded flex items-center justify-center">
+                        <form class="flex" @submit.prevent="search.get('/users?name='+ search.name)">
+                                <input
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    v-model="search.name"
+                                    id="search"
+                                    type="text"
+                                    placeholder="Enter your search query..."
+                                />
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    type="submit"
+                                >
+                                    Search
+                                </button>
                         </form>
-                        <form v-else @submit.prevent="form.post('/following/'+ user.id)" >
-                            <input type="hidden" v-model="form.id" />
-                            <button
-                                type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm
-                                    font-medium rounded-md bg-green-600 hover:bg-green-700 focus:outline-none
-                                    focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                            >
-                                Follow
-                            </button>
-                        </form>
-                    </footer>
-                </div>
-            </div>
-
-            <div v-else class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
-                        Not users yet
                     </div>
                 </div>
             </div>
+        </template>
 
-        </div>
+        <UserListCards :users="users" :following="following" />
+        <Pagination :collection="users" />
     </AuthenticatedLayout>
 </template>

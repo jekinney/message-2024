@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group( function() {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::middleware('auth:sanctum')->post('/user/search', [UserController::class, 'search']);
+    Route::middleware('auth:sanctum')->post('/message/like/{message}', [MessageController::class, 'like']);
+    Route::middleware('auth:sanctum')->post('/message/unlike/{message}', [MessageController::class, 'unlike']);
+    Route::middleware('auth:sanctum')->post('/message/report/{message}', [MessageController::class, 'report']);
 });

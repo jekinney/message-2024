@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('unlikes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->onDelete('cascade');
+            $table->bigInteger('unlikeable_id');
+            $table->string('unlikeable_type');
             $table->timestamps();
         });
     }

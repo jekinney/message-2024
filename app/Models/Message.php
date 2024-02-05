@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Message extends Model
 {
@@ -48,6 +49,36 @@ class Message extends Model
     }
 
     /**
+     * Get all of the messages likes.
+     *
+     * @return MorphMany
+     */
+    public function likeable(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Get all of the messages unlikes.
+     *
+     * @return MorphMany
+     */
+    public function unlikeable(): MorphMany
+    {
+        return $this->morphMany(Unlike::class, 'unlikeable');
+    }
+
+    /**
+     * Get all of the messages reports.
+     *
+     * @return MorphMany
+     */
+    public function reportable(): MorphMany
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    /**
      * Gather a user's feed or messages.
      * Should order by created at date
      * and include followed users too.
@@ -57,7 +88,10 @@ class Message extends Model
      */
     public function feed(Request $request): LengthAwarePaginator
     {
-        return $this->whereIn('author_id',
+        return $this->withCount([
+                'likeable',
+                'unlikeable'
+            ])->whereIn('author_id',
                 $request->user()->followers->pluck('id')->merge($request->user()->id)->toArray()
             )->latest()
             ->paginate($request->amount?? 10);
@@ -94,6 +128,15 @@ class Message extends Model
         $this->update(['body' => $request->body]);
 
         return $this->feed($request);
+    }
+
+    public function addLike()
+    {
+        dd( $this->likeable()->where('user_id', auth()->user()->id) );
+        auth()->user()->likes()->where(['likeable_id' => $this->id]);
+        $this->likeable()->create([
+            'user_id' => auth()->user()->id
+        ]);
     }
 
     /**

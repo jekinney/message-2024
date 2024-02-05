@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->onDelete('cascade');
+            $table->string('remarks', 550)->nullable();
+            $table->bigInteger('reportable_id');
+            $table->string('reportable_type');
             $table->timestamps();
         });
     }

@@ -19,6 +19,6 @@ const props = defineProps({
 
         <MessageList :messages="messages"/>
 
-        <Pagination :messages="messages" />
+        <Pagination :collection="messages" />
     </AuthenticatedLayout>
 </template>

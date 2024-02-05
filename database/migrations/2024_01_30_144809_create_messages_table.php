@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('author_id')->references('id')->on('users');
             $table->json('body');
+            $table->unsignedInteger('likes')->default(0);
+            $table->unsignedInteger('unlikes')->default(0);
+            $table->unsignedInteger('reports')->default(0);
             $table->timestamps();
         });
     }
