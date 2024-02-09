@@ -1,6 +1,6 @@
 <template>
-  <nav class="flex justify-center mt-4">
-    <ul v-show="pages" class="pagination">
+  <nav v-if="pages" class="flex justify-center mt-4">
+    <ul class="pagination">
       <li class="page-item" :class="{ disabled: collection.current_page === 1 }">
         <button @click="previousPage" class="page-link">Previous</button>
       </li>

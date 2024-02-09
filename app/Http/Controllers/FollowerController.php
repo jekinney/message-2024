@@ -11,10 +11,10 @@ class FollowerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, User $user)
     {
         return Inertia::render('Followers/List', [
-            'followers' => auth()->user()->followers()->paginate(10)
+            'followers' => $user->getFollowersList($request)
         ]);
     }
 

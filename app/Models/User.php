@@ -20,6 +20,17 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'created_at' => 'datetime:F j, Y \a\t g:i a',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -38,17 +49,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'created_at' => 'datetime:F j, Y \a\t g:i a',
     ];
 
     /**
@@ -138,22 +138,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Search db by a user name
-     *
-     * @param  Request $request
-     * @return LengthAwarePaginator
-     */
-    public function search(User $query, Request $request): LengthAwarePaginator
-    {
-        // Validate we have a name variable
-        $request->validate([
-            'name' => 'required|string',
-        ]);
-
-        return $query->where('name', 'like', '%'.$request->name.'%')
-                ->paginate($request->amount?? 10);
-    }
-    /**
      * A public list of users'. Will not
      * include any private or otherwise
      * users deemed unacceptable, ban,
@@ -164,12 +148,13 @@ class User extends Authenticatable
      */
     public function publicList(Request $request): LengthAwarePaginator
     {
+        $query = $this->latest()->where('id', '!=', $request->user()->id);
+        // Check if we are searching or not. If so add where statement
         if ( $request->has('name') ) {
-            return $this->latest()
-                ->where('name', 'LIKE', '%'.$request->name.'%')
-                ->paginate($request->amount?? 10);
+            $query = $query->where('name', 'LIKE', '%'.$request->name.'%');
         }
-        return $this->latest()->paginate($request->amount?? 10);
+        // Execute the query
+        return $query->paginate($request->amount?? 10);
     }
 
     /**
@@ -248,5 +233,18 @@ class User extends Authenticatable
         }
         // return a collection of user ids'
         return $following->pluck('id');
+    }
+
+    public function getFollowersList(Request $request): LengthAwarePaginator
+    {
+        // load a user's followers users
+        $followers = $request->user()->followers();
+        // If empty (not followers any users) return null
+        if ( $followers->count() == 0 ) {
+            return null;
+        }
+
+        return $followers->withCount(['following', 'followers', 'messages'])
+                ->paginate($request->amount?? 10);
     }
 }

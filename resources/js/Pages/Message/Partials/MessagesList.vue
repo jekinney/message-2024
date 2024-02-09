@@ -16,7 +16,6 @@ function addLike(id) {
 }
 
 function addUnlike(id) {
-    console.log(id)
     // this.$inertia.post(`/message/unlike/${id}`)
     // .then(response => {
     //     this.messages = response.data.data
@@ -26,7 +25,6 @@ function addUnlike(id) {
 }
 
 function submitReport(id) {
-    console.log(id)
     // this.$inertia.post(`/message/report/${id}`)
     // .then(response => {
     //     this.messages = response.data.data

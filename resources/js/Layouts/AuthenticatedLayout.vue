@@ -29,26 +29,26 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('messages')" :active="route().current('messages')">
-                                    Messages
-                                </NavLink>
-                            </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('users')" :active="route().current('users')">
                                     Users
                                 </NavLink>
                             </div>
-
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink :href="route('messages')" :active="route().current('messages')">
+                                    Messages <span class="">{{ $page.props.auth.user.messages_count }}</span>
+                                </NavLink>
+                            </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('followers')" :active="route().current('followers')">
-                                    Followers
+                                    Followers {{ $page.props.auth.user.followers_count }}
                                 </NavLink>
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('following')" :active="route().current('following')">
-                                    Following
+                                    Following {{ $page.props.auth.user.followers_count }}
                                 </NavLink>
                             </div>
+
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -166,3 +166,4 @@ const showingNavigationDropdown = ref(false);
         </div>
     </div>
 </template>
+
